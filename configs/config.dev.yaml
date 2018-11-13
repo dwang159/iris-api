@@ -5,7 +5,19 @@ server:
   host: 0.0.0.0
   port: 16649
   disable_auth: True # allow logins by existing users, but without checking credentials
+  allow_http: True # seession cookies marked secure=False if allow_http enabled. Disable in production
   local_api_url: http://localhost:16649
+
+## Sample ldap authentication configuration
+# auth:
+#   module: iris.ui.auth.ldap
+#   ldap_url: 'ldap://localhost:10389'
+#   ldap_cert_path: '/etc/cert.pem'
+#   ldap_base_dn: 'ou=users,ou=system'
+#   ldap_bind_user: 'cn=demo,ou=users,ou=system' # LDAP user with read access to look up users by username
+#   ldap_bind_password: 'abc' # password for bind user
+#   ldap_search_filter: '(uid=%s)' # Filter to search for users by username. ldap authenticator will % format the username into this filter.
+
 
 db: &db
   conn:

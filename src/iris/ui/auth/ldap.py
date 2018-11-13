@@ -30,10 +30,11 @@ class Authenticator:
         self.ldap_url = config['auth'].get('ldap_url')
         self.base_dn = config['auth'].get('ldap_base_dn')
 
-        self.user_suffix = config['auth'].get('ldap_user_suffix')
+        self.user_suffix = config['auth'].get('ldap_user_suffix', '')
 
     def ldap_auth(self, username, password):
-        ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, self.cert_path)
+        if self.cert_path:
+            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, self.cert_path)
         connection = ldap.initialize(self.ldap_url)
         connection.set_option(ldap.OPT_REFERRALS, 0)
 
