@@ -57,8 +57,10 @@ class oncall(object):
         if role == 'team':
             result = self.call_oncall('/teams/%s/rosters' % target)
             if not isinstance(result, dict):
-                stats['oncall_error'] += 1
-                raise IrisRoleLookupException('Invalid data received from oncall-api')
+                if result is None:
+                    return result
+                else:
+                    raise IrisRoleLookupException('Invalid data received from oncall-api')
             user_list = []
             for roster in result:
                 for user in result[roster]['users']:
@@ -67,8 +69,10 @@ class oncall(object):
         elif role == 'manager':
             result = self.call_oncall('/teams/%s/oncall/manager' % target)
             if not isinstance(result, list):
-                stats['oncall_error'] += 1
-                raise IrisRoleLookupException('Invalid data received from oncall-api')
+                if result is None:
+                    return result
+                else:
+                    raise IrisRoleLookupException('Invalid data received from oncall-api')
             if result:
                 return [user['user'] for user in result]
         # "oncall" role maps to primary, otherwise grab shift type from the role suffix (eg "oncall-shadow")
@@ -76,8 +80,10 @@ class oncall(object):
             oncall_type = 'primary' if role == 'oncall' else role[7:]
             result = self.call_oncall('/teams/%s/oncall/%s' % (target, oncall_type))
             if not isinstance(result, list):
-                stats['oncall_error'] += 1
-                raise IrisRoleLookupException('Invalid data received from oncall-api')
+                if result is None:
+                    return result
+                else:
+                    raise IrisRoleLookupException('Invalid data received from oncall-api')
             if result:
                 return [user['user'] for user in result]
         # Other roles can't be handled by this plugin; return None.

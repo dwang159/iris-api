@@ -319,7 +319,7 @@ def create_messages(incident_id, plan_notification_id):
             pass
 
         if not name:
-            logger.error(('Failed to find targets for incident %s, plan_notification_id: %s, '
+            logger.warning(('Failed to find targets for incident %s, plan_notification_id: %s, '
                           'role: %s, target: %s, result: %s and failed looking '
                           'up the plan\'s creator'),
                          incident_id, plan_notification_id, role, target, names)
@@ -334,7 +334,7 @@ def create_messages(incident_id, plan_notification_id):
                          incident_id, plan_notification_id, role, target, names)
             return False
 
-        logger.error(('Failed to find targets for incident %s, plan_notification_id: %s, '
+        logger.warning(('Failed to find targets for incident %s, plan_notification_id: %s, '
                       'role: %s, target: %s, result: %s. '
                       'Reaching out to %s instead and lowering priority to low (%s)'),
                      incident_id, plan_notification_id, role, target, names, name, priority_id)
@@ -622,7 +622,7 @@ def fetch_and_prepare_message():
     plan = cache.plans[plan_id]
 
     # queue key
-    key = (m['plan_id'], m['application'], m['priority'], m['target'])
+    key = (m['plan_id'], m['application'], m['priority'], m['target']
 
     # should this message be aggregated?
     aggregate = False
@@ -1027,7 +1027,7 @@ def distributed_send_message(message, vendor_manager):
             if coordinator.slave_count and coordinator.slaves:
                 for i, address in enumerate(coordinator.slaves):
                     if i >= coordinator.slave_count:
-                        logger.error('Failed using all configured slaves; resorting to local send_message')
+                        logger.warning('Failed using all configured slaves; resorting to local send_message')
                         break
                     if rpc.send_message_to_slave(message, address):
                         return True, False
@@ -1150,7 +1150,7 @@ def fetch_and_send_message(send_queue, vendor_manager):
         logger.exception('Failed to send message: %s', message)
         add_mode_stat(message['mode'], None)
         if message.get('unexpanded'):
-            logger.error('unable to send %(mode)s %(message_id)s %(application)s %(destination)s %(subject)s %(body)s', message)
+            logger.warning('unable to send %(mode)s %(message_id)s %(application)s %(destination)s %(subject)s %(body)s', message)
         elif message['mode'] == 'email':
             metrics.incr('task_failure')
             logger.error('unable to send %(mode)s %(message_id)s %(application)s %(destination)s %(subject)s %(body)s', message)
